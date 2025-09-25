@@ -1,0 +1,20 @@
+# User data files - contain personal conversation data
+conversations.json
+claude_export_analysis.json
+claude_schema.json
+
+# Generated output directories - contain processed personal data
+claude_conversations_markdown/
+
+# Node.js dependencies (if added later)
+node_modules/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
