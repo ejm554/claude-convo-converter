@@ -1,5 +1,18 @@
 # Claude Conversation Converter - Project Roadmap
 
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Current Status](#current-status)
+- [Critical Priority](#critical-priority-data-loss-issues)
+- [High Priority](#high-priority-core-functionality)
+- [Medium Priority](#medium-priority-enhancement--testing)
+- [Low Priority](#low-priority-organization--future-features)
+- [Completed Items](#completed-items)
+- [Notes and Considerations](#notes-and-considerations)
+
+---
+
 ## Project Overview
 
 A Node.js tool that converts Claude conversation JSON exports into well-formatted Markdown archives with comprehensive metadata, timezone conversion, and schema change detection.
@@ -131,22 +144,11 @@ A Node.js tool that converts Claude conversation JSON exports into well-formatte
 - **Description**: Formal project management and documentation
 - **Next Steps**: Migrate high-priority items to GitHub Issues
 
-### 11. Chat Memory Organization Integration
+### 14. Chat Memory Organization Integration
 - **Status**: Not Started
 - **Description**: Connect with broader conversation management workflows
 - **Context**: Related to conversation referenced in chat memory organization discussion
 - **Scope**: To be defined based on memory system requirements
-
-### 12. CSS Styling for Markdown
-- **Status**: Not Started
-- **Description**: Create optional CSS themes for enhanced visual presentation of archived conversations
-- **Features**: 
-  - Address large footnote superscript numbers for better readability
-  - Provide multiple themes (print-friendly, screen reading, academic formatting)
-  - Community contribution framework for custom themes
-- **Implementation**: Include sample CSS files with documentation for applying to markdown renderers
-- **Community aspect**: CSS themes ideal for open-source contributions - self-contained, customizable, don't affect core functionality
-- **Technical considerations**: Must work across different markdown parsers and rendering engines
 
 ### 15. CSS Styling for Markdown
 - **Status**: Not Started
@@ -159,8 +161,7 @@ A Node.js tool that converts Claude conversation JSON exports into well-formatte
 - **Community aspect**: CSS themes ideal for open-source contributions - self-contained, customizable, don't affect core functionality
 - **Technical considerations**: Must work across different markdown parsers and rendering engines
 
-### 16. Export Comparison and Deletion Detection
-*Partial duplicate of item 19. Slight differences exist between the two. TODO: Merge carefully.* 
+### 16. Export Comparison and Change Detection
 - **Status**: Not Started
 - **Description**: Compare new exports with previous exports to identify deleted conversations, renamed conversations, and track archive evolution
 - **Features**:
@@ -182,7 +183,6 @@ A Node.js tool that converts Claude conversation JSON exports into well-formatte
 - **Priority**: Medium - useful for understanding conversation lifecycle and archive completeness
 
 ### 17. UTC Time Format Improvements
-*Another item, below, shares this same item number. TODO: Update all assigned numbers.* 
 - **Status**: Not Started
 - **Description**: Fix 24-hour formatting and cross-timezone handling
 - **Issues**: 
@@ -190,34 +190,17 @@ A Node.js tool that converts Claude conversation JSON exports into well-formatte
   - Handle cases where local date ≠ UTC date
 - **Impact**: Low - current system functional but could be more precise
 
-### 17. Conversation Versioning Strategy  
-*Another item, above, shares this same item number. TODO: Update all assigned numbers.* 
+### 18. Conversation Versioning Strategy  
 - **Status**: Not Started
 - **Description**: Handle updated conversations and naming conflicts
 - **Current**: Basic duplicate handling with time disambiguation
 - **Enhancement**: More sophisticated versioning, change detection, metadata tracking
 
-### 18. Migrate Conversation to Existing Project
+### 19. Migrate Conversation to Existing Project
 - **Status**: ✅ COMPLETE
 - **Description**: Transfer this conversation's context to the "Creative #code and tech ideas" project
 - **Resolution**: Claude now provides native conversation migration feature - conversation successfully moved to project
 - **Benefits**: Access to project-wide instructions, educational protocols, and organized conversation management
-
-### 19. Export Comparison and Deletion Detection
-*Partial duplicate of item 16. Slight differences exist between the two. TODO: Merge carefully.* 
-- **Status**: Not Started
-- **Description**: Compare new exports with previous exports to identify deleted conversations and track archive evolution
-- **Features**:
-  - Store lightweight metadata snapshot from each export (conversation IDs, titles, dates, message counts)
-  - Compare new export against previous snapshot to detect missing conversations
-  - Generate deletion report showing conversations present in old export but missing in new
-  - Preserve last-known metadata for deleted conversations
-- **Architecture**: JSON-based index file tracking conversation metadata across exports
-- **Testing Requirements**: 
-  - Examine actual deleted conversation structure in real exports
-  - Verify detection accuracy across deletion scenarios
-  - Test edge cases (renamed conversations, potential ID reuse)
-- **Priority**: Medium - depends on whether deleted conversations create actual archival problems
 
 ### 20. Export Activity Reporting and Analytics
 - **Status**: Not Started
@@ -269,13 +252,13 @@ A Node.js tool that converts Claude conversation JSON exports into well-formatte
 - ✅ Attachment extraction with collision handling
 - ✅ Flexible timezone conversion
 - ✅ Schema change detection
-- ✅ Comprehensive README documentation (item 3a)
-- ✅ Similar tools analysis and positioning (item 3b)
-- ✅ Git repository setup (item 4)
-- ✅ Basic JSON structure analyzer tool (item 3, 7)
+- ✅ Comprehensive README documentation
+- ✅ Similar tools analysis and positioning
+- ✅ Git repository setup
+- ✅ Basic JSON structure analyzer tool
 - ✅ Sensitive data removal from Git history (item 0)
 - ✅ Repository made public (item 0)
-- ✅ Conversation migrated to project (item 15)
+- ✅ Conversation migrated to project (item 19)
 - ✅ Learning reference document created
 - ✅ Artifact content preservation fixed (item 1)
 
