@@ -2,6 +2,7 @@
 conversations.json
 claude_export_analysis.json
 claude_schema.json
+extracted_messages.json
 
 # Generated output directories - contain processed personal data
 claude_conversations_markdown/

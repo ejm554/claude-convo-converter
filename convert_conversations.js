@@ -5,7 +5,7 @@
  * DESCRIPTION: Converts exported Claude conversation JSON files into individual Markdown files for archival purposes.
  * AUTHOR: EJ Makela
  * ORIGINAL CREATION DATE: 2025-09-23
- * CREDIT: Assistance provided by Claude, Sonnet 4 (https://claude.ai/chat/[current-conversation-id])
+ * CREDIT: Assistance provided by Claude, Sonnet 4.5 (https://claude.ai/chat/[current-conversation-id])
  */
 
 // Import required Node.js modules
@@ -90,20 +90,57 @@ function formatDateWithDay(dateString) {
 
 /**
  * Extracts text content from Claude's message content array
- * Claude stores messages in a complex nested structure - this simplifies it
+ * UPDATED: Now also extracts artifact code from tool_use blocks
+ * 
+ * Claude stores messages in a complex nested structure with multiple content types:
+ * - type: "text" - Regular conversation text
+ * - type: "tool_use" - When Claude uses tools (like creating artifacts)
+ * - type: "tool_result" - Results returned from tools
+ * 
+ * This function extracts all relevant content and formats it appropriately.
  * 
  * @param {Array} content - The content array from a chat message
- * @returns {string} - Plain text content of the message
+ * @returns {string} - Plain text and formatted code blocks
  */
 function extractTextFromContent(content) {
     // Handle cases where content might be missing or malformed
     if (!content || !Array.isArray(content)) return '';
     
-    // Filter for text-type content and join multiple text blocks
-    return content
-        .filter(item => item.type === 'text')  // Only get text items (ignore images, etc.)
-        .map(item => item.text || '')          // Extract the text property
-        .join('\n\n');                         // Join with double newlines for readability
+    const parts = [];
+    
+    content.forEach(item => {
+        // Extract regular text blocks
+        if (item.type === 'text' && item.text) {
+            parts.push(item.text);
+        }
+        
+        // Extract artifact code from tool_use blocks
+        // Artifacts contain code, documents, or other structured content
+        if (item.type === 'tool_use' && item.name === 'artifacts') {
+            if (item.input && item.input.content) {
+                // Get the language for proper syntax highlighting
+                const language = item.input.language || '';
+                const title = item.input.title || 'Artifact';
+                
+                // Format as a code block with title
+                parts.push(`\n**${title}**\n\n\`\`\`${language}\n${item.input.content}\n\`\`\`\n`);
+            }
+        }
+        
+        // Optionally extract tool results (for debugging or completeness)
+        // Uncomment if you want to see tool execution results in the archive
+        /*
+        if (item.type === 'tool_result' && item.content) {
+            const resultText = Array.isArray(item.content) 
+                ? item.content.map(c => c.text).join('\n')
+                : item.content;
+            parts.push(`\n*[Tool result: ${resultText}]*\n`);
+        }
+        */
+    });
+    
+    // Join all parts with double newlines for readability
+    return parts.join('\n\n');
 }
 
 /**
@@ -243,7 +280,7 @@ function extractAttachments(conversation, conversationFileName) {
                     });
                     
                 } catch (error) {
-                    console.log(`⚠️  Error extracting attachment from message ${messageIndex + 1}: ${error.message}`);
+                    console.log(`Warning: Error extracting attachment from message ${messageIndex + 1}: ${error.message}`);
                 }
             });
         }
@@ -291,7 +328,7 @@ function collectKeys(obj, prefix = '', keySet = new Set()) {
  * @param {Array} conversations - Array of conversation objects to analyze
  */
 function trackSchemaChanges(conversations) {
-    console.log('📊 Analyzing JSON structure...');
+    console.log('Analyzing JSON structure...');
     
     // Collect all unique keys from the conversation data
     const currentKeys = new Set();
@@ -311,7 +348,7 @@ function trackSchemaChanges(conversations) {
             const schemaData = fs.readFileSync(SCHEMA_FILE, 'utf8');
             previousSchema = JSON.parse(schemaData);
         } catch (error) {
-            console.log('⚠️  Could not read previous schema file:', error.message);
+            console.log('Warning: Could not read previous schema file:', error.message);
         }
     }
     
@@ -326,35 +363,35 @@ function trackSchemaChanges(conversations) {
         
         // Alert user to significant changes
         if (addedKeys.length > 0 || removedKeys.length > 0) {
-            console.log('\n🚨 JSON STRUCTURE HAS CHANGED! 🚨');
+            console.log('\n*** JSON STRUCTURE HAS CHANGED! ***');
             
             if (addedKeys.length > 0) {
-                console.log('📈 New keys found:');
+                console.log('New keys found:');
                 addedKeys.forEach(key => console.log(`   + ${key}`));
             }
             
             if (removedKeys.length > 0) {
-                console.log('📉 Keys no longer present:');
+                console.log('Keys no longer present:');
                 removedKeys.forEach(key => console.log(`   - ${key}`));
             }
             
-            console.log('\n💡 This might mean:');
-            console.log('   • Anthropic added new features (like model version info!)');
-            console.log('   • The export format changed');
-            console.log('   • This script might need updates\n');
+            console.log('\nThis might mean:');
+            console.log('   - Anthropic added new features (like model version info!)');
+            console.log('   - The export format changed');
+            console.log('   - This script might need updates\n');
         } else {
-            console.log('✅ JSON structure unchanged since last run');
+            console.log('JSON structure unchanged since last run');
         }
     } else {
-        console.log('📝 First run - saving current JSON structure for future comparison');
+        console.log('First run - saving current JSON structure for future comparison');
     }
     
     // Save the current schema for next time
     try {
         fs.writeFileSync(SCHEMA_FILE, JSON.stringify(currentSchema, null, 2));
-        console.log(`💾 Schema saved to ${SCHEMA_FILE}`);
+        console.log(`Schema saved to ${SCHEMA_FILE}`);
     } catch (error) {
-        console.log('⚠️  Could not save schema file:', error.message);
+        console.log('Warning: Could not save schema file:', error.message);
     }
 }
 
@@ -476,11 +513,11 @@ function convertConversationToMarkdown(conversation, index) {
  * Reads the JSON file, processes all conversations, and creates Markdown files
  */
 function main() {
-    console.log('🔄 Claude Conversations Converter Starting...\n');
+    console.log('Claude Conversations Converter Starting...\n');
     
     try {
         // Step 1: Read and parse the JSON file
-        console.log(`📖 Reading ${INPUT_FILE}...`);
+        console.log(`Reading ${INPUT_FILE}...`);
         
         // Check if the input file exists before trying to read it
         if (!fs.existsSync(INPUT_FILE)) {
@@ -495,7 +532,7 @@ function main() {
             throw new Error('JSON file does not contain an array of conversations. Please check the file format.');
         }
         
-        console.log(`✅ Found ${conversations.length} conversations`);
+        console.log(`Found ${conversations.length} conversations`);
         
         // Step 2: Analyze the JSON structure for changes
         trackSchemaChanges(conversations);
@@ -503,11 +540,11 @@ function main() {
         // Step 3: Create the output directory if it doesn't exist
         if (!fs.existsSync(OUTPUT_DIR)) {
             fs.mkdirSync(OUTPUT_DIR);
-            console.log(`📁 Created output directory: ${OUTPUT_DIR}`);
+            console.log(`Created output directory: ${OUTPUT_DIR}`);
         }
         
         // Step 4: Process each conversation
-        console.log('\n🔄 Converting conversations...');
+        console.log('\nConverting conversations...');
         let successCount = 0;
         let errorCount = 0;
         let totalAttachments = 0;
@@ -527,37 +564,37 @@ function main() {
                 
                 // Log with attachment info if present
                 const attachmentNote = result.attachmentCount > 0 ? ` (${result.attachmentCount} attachments)` : '';
-                console.log(`✅ ${result.filename}${attachmentNote}`);
+                console.log(`✓ ${result.filename}${attachmentNote}`);
                 
             } catch (error) {
-                console.log(`❌ Error processing conversation ${index + 1}: ${error.message}`);
+                console.log(`✗ Error processing conversation ${index + 1}: ${error.message}`);
                 errorCount++;
             }
         });
         
         // Step 5: Report final results
-        console.log('\n📊 Conversion Summary:');
-        console.log(`   ✅ Successfully converted: ${successCount} conversations`);
-        console.log(`   📎 Extracted attachments: ${totalAttachments} files`);
+        console.log('\nConversion Summary:');
+        console.log(`   Successfully converted: ${successCount} conversations`);
+        console.log(`   Extracted attachments: ${totalAttachments} files`);
         if (errorCount > 0) {
-            console.log(`   ❌ Failed to convert: ${errorCount} conversations`);
+            console.log(`   Failed to convert: ${errorCount} conversations`);
         }
-        console.log(`   📁 Output directory: ${OUTPUT_DIR}`);
-        console.log(`   🗂️  Schema tracking: ${SCHEMA_FILE}`);
+        console.log(`   Output directory: ${OUTPUT_DIR}`);
+        console.log(`   Schema tracking: ${SCHEMA_FILE}`);
         
-        console.log('\n🎉 Conversion complete!');
+        console.log('\nConversion complete!');
         
     } catch (error) {
         // Handle any major errors that prevent the script from running
-        console.error('💥 Fatal error:', error.message);
-        console.log('\n📖 Usage Instructions:');
+        console.error('Fatal error:', error.message);
+        console.log('\nUsage Instructions:');
         console.log('1. Place your exported conversations.json file in the same directory as this script');
         console.log('2. Run the script: node convert_conversations.js');
         console.log('3. Find your converted files in the output directory');
-        console.log('\n🔧 Troubleshooting:');
-        console.log('• Ensure conversations.json is valid JSON');
-        console.log('• Check file permissions in the current directory');
-        console.log('• Make sure you have Node.js installed');
+        console.log('\nTroubleshooting:');
+        console.log('- Ensure conversations.json is valid JSON');
+        console.log('- Check file permissions in the current directory');
+        console.log('- Make sure you have Node.js installed');
         
         // Exit with error code to indicate failure
         process.exit(1);
