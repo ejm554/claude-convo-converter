@@ -160,7 +160,7 @@ A Node.js tool that converts Claude conversation JSON exports into well-formatte
 - **Technical considerations**: Must work across different markdown parsers and rendering engines
 
 ### 16. Export Comparison and Deletion Detection
-*Partial duplicate of item 19. Slight differnces exist between the two. A careful merge is needed.* 
+*Partial duplicate of item 19. Slight differences exist between the two. TODO: Merge carefully.* 
 - **Status**: Not Started
 - **Description**: Compare new exports with previous exports to identify deleted conversations, renamed conversations, and track archive evolution
 - **Features**:
@@ -182,6 +182,7 @@ A Node.js tool that converts Claude conversation JSON exports into well-formatte
 - **Priority**: Medium - useful for understanding conversation lifecycle and archive completeness
 
 ### 17. UTC Time Format Improvements
+*Another item, below, shares this same item number. TODO: Update all assigned numbers.* 
 - **Status**: Not Started
 - **Description**: Fix 24-hour formatting and cross-timezone handling
 - **Issues**: 
@@ -190,6 +191,7 @@ A Node.js tool that converts Claude conversation JSON exports into well-formatte
 - **Impact**: Low - current system functional but could be more precise
 
 ### 17. Conversation Versioning Strategy  
+*Another item, above, shares this same item number. TODO: Update all assigned numbers.* 
 - **Status**: Not Started
 - **Description**: Handle updated conversations and naming conflicts
 - **Current**: Basic duplicate handling with time disambiguation
@@ -202,7 +204,7 @@ A Node.js tool that converts Claude conversation JSON exports into well-formatte
 - **Benefits**: Access to project-wide instructions, educational protocols, and organized conversation management
 
 ### 19. Export Comparison and Deletion Detection
-*Partial duplicate of item 16. Slight differnces exist between the two. A careful merge is needed.* 
+*Partial duplicate of item 16. Slight differences exist between the two. TODO: Merge carefully.* 
 - **Status**: Not Started
 - **Description**: Compare new exports with previous exports to identify deleted conversations and track archive evolution
 - **Features**:
