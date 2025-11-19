@@ -536,7 +536,7 @@ function convertConversationToMarkdown(conversation, index) {
  * Main function that handles the complete conversion process
  * Reads the JSON file, processes all conversations, and creates Markdown files
  */
-function main() {
+async function main() {
     console.log('Claude Conversations Converter Starting...\n');
     
     try {
@@ -561,8 +561,52 @@ function main() {
         // Step 2: Analyze the JSON structure for changes
         trackSchemaChanges(conversations);
         
-        // Step 3: Create the output directory if it doesn't exist
-        if (!fs.existsSync(OUTPUT_DIR)) {
+        // Step 3: Check if the output directory already exists and prompt user
+        if (fs.existsSync(OUTPUT_DIR)) {
+            const readline = require('readline');
+            const rl = readline.createInterface({
+                input: process.stdin,
+                output: process.stdout
+            });
+            
+            // Add ANSI color codes for better visibility
+            const colors = {
+                reset: '\x1b[0m',
+                bright: '\x1b[1m',
+                red: '\x1b[31m',
+                yellow: '\x1b[33m',
+                cyan: '\x1b[36m',
+                bgRed: '\x1b[41m',
+                bgYellow: '\x1b[43;30m' // Yellow background with black text
+            };
+            
+            console.log(`\n${colors.bgRed}${colors.bright} ⚠️  WARNING ${colors.reset}`);
+            console.log(`${colors.red}${colors.bright}It appears that an output directory for the current conversation.js file already exists.${colors.reset}`);
+            console.log(`${colors.red}${colors.bright}If you continue to run this script, it may output duplicate data.${colors.reset}`);
+            
+            console.log(`\n${colors.cyan}💡 TIP: Unless you are intentionally trying to analyze an older set of conversations again,`);
+            console.log(`you should cancel this process. If you are expecting to analyze a new set of conversations`);
+            console.log(`you should still cancel the process and try again with a different conversations.json file.${colors.reset}\n`);
+            
+            // Use a Promise to make the asynchronous readline operation work with the flow
+            const shouldCancel = await new Promise((resolve) => {
+                rl.question(`❓ Cancel? [Y]/N (Default is Y to cancel, N to continue): `, (answer) => {
+                    rl.close();
+                    // If answer is empty or starts with 'y', treat as yes (cancel)
+                    // Only continue if user explicitly types 'n'
+                    const normalizedAnswer = answer.trim().toLowerCase();
+                    resolve(normalizedAnswer === '' || normalizedAnswer.startsWith('y'));
+                });
+            });
+            
+            if (shouldCancel) {
+                console.log('Operation cancelled by user.');
+                process.exit(0);
+            }
+            
+            console.log('Continuing with conversion...');
+        } else {
+            // Create the output directory if it doesn't exist
             fs.mkdirSync(OUTPUT_DIR);
             console.log(`Created output directory: ${OUTPUT_DIR}`);
         }
@@ -629,5 +673,8 @@ function main() {
 // Only run the main function if this script is executed directly (not imported)
 
 if (require.main === module) {
-    main();
+    main().catch(error => {
+        console.error('Error during execution:', error.message);
+        process.exit(1);
+    });
 }
