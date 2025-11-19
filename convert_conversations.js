@@ -16,7 +16,31 @@ const path = require('path');       // Path manipulation utilities for cross-pla
 // These constants control how the conversion works - modify as needed
 
 const INPUT_FILE = 'conversations.json';           // Name of the input JSON file from Claude export
-const OUTPUT_DIR = 'claude_conversations_markdown'; // Directory where converted Markdown files will be saved
+// Create output directory with timestamp from conversations.json modification date
+function getOutputDirWithTimestamp() {
+    // Get the modification date of the input file
+    try {
+        const stats = fs.statSync(INPUT_FILE);
+        const modDate = stats.mtime;
+        
+        // Format the timestamp as YYYY-MM-DD_HHMMSS
+        const year = modDate.getFullYear();
+        const month = String(modDate.getMonth() + 1).padStart(2, '0');
+        const day = String(modDate.getDate()).padStart(2, '0');
+        const hours = String(modDate.getHours()).padStart(2, '0');
+        const minutes = String(modDate.getMinutes()).padStart(2, '0');
+        const seconds = String(modDate.getSeconds()).padStart(2, '0');
+        
+        const timestamp = `${year}-${month}-${day}_${hours}${minutes}${seconds}`;
+        return `claude_conversations_markdown_${timestamp}`;
+    } catch (error) {
+        // Fall back to error indicator when timestamp can't be obtained
+        console.log(`Warning: Could not get modification time from ${INPUT_FILE}: ${error.message}`);
+        return 'claude_conversations_markdown_TIMESTAMP-ERROR';
+    }
+}
+
+const OUTPUT_DIR = getOutputDirWithTimestamp(); // Directory where converted Markdown files will be saved
 const SCHEMA_FILE = 'claude_schema.json';          // File to track JSON structure changes over time
 
 // ===== UTILITY FUNCTIONS =====
